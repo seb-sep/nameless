@@ -1,0 +1,20 @@
+openapi: 3.1.0
+info:
+  title: Feedback Manager - OpenAPI 3.1.0
+  summary: An API for student accounts to send anonymous messages to teachers.
+  contact:
+    name: Sebastian Sepulveda
+    email: sepulveda.s@northeastern.edu
+  license: TODO
+  version: TODO
+servers: TODO
+paths:
+  /feedback:
+    post:
+      summary: Send a message to the given teacher.
+
+Future paths:
+  Add a new student account to the database? Depends on the specifics of form sending 
+    Thought: Create account with active set to False, then set active to True once you've validated your email
+  Post a new message from a student to the database and automatically send it to the teacher
+  For a given student account, return all the messages they've sent as JSON
