@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
-import local_settings
+from . import local_settings
 import pymysql
 pymysql.version_info = (1, 4, 2, "final", 0)
 pymysql.install_as_MySQLdb()
@@ -43,7 +43,6 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "feedback_man.apps.FeedbackManConfig"
 
-    "rest_framework"
 ]
 
 MIDDLEWARE = [
