@@ -5,5 +5,5 @@ from .models import StudentAccount
 # Register your models here.
 
 #Switching default user to StudentAccount class
-admin.site.register(StudentAccount, UserAdmin)
+admin.site.register(StudentAccount)
 
