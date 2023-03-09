@@ -9,9 +9,9 @@ class Teacher(models.Model):
     Shares a many-to-many relationship with the Course table."""
 
 
-    teacher_name = models.CharField(max_length=255, unique=True)
-    college = models.CharField(max_length=255)
-    email = models.EmailField(max_length=255, unique=True)
+    teacher_name = models.CharField(max_length=256, unique=True)
+    college = models.CharField(max_length=256)
+    email = models.EmailField(max_length=256, unique=True)
 
     def __str__(self):
         """Return a string representation of the teacher: their name."""
@@ -35,18 +35,19 @@ class Course(models.Model):
     )
     year = models.IntegerField(null=True)
     course_num = models.IntegerField(null=True)
-    subject = models.CharField(default="")
+    subject = models.CharField(max_length=256)
     teachers = models.ManyToManyField(Teacher)
 
     def __str__(self):
         """Return a string representation of the course: the course number and name."""
+        return f"{self.course_num} {self.class_name}"
 
 
 class StudentAccount(AbstractBaseUser):
     """A model class for representing a student account in the database."""
 
     student_email = models.EmailField(unique=True)
-
+    num_infractions = models.IntegerField(default=0)
     USERNAME_FIELD = 'student_email'
     EMAIL_FIELD = 'student_email'
     REQUIRED_FIELDS = []
@@ -67,4 +68,5 @@ class Message(models.Model):
     student = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
     message_body = models.TextField()
+    is_malicious = models.BooleanField(default=False)
 
