@@ -13,7 +13,7 @@ class Teacher(models.Model):
 
     teacher_name = models.CharField(max_length=256, unique=True)
     college = models.CharField(max_length=256)
-    email = models.EmailField(max_length=256, unique=True)
+    email = models.EmailField(max_length=256, unique=True, primary_key=True)
 
     def __str__(self):
         """Return a string representation of the teacher: their name."""
@@ -88,7 +88,7 @@ class StudentManager(BaseUserManager):
 class StudentAccount(AbstractBaseUser, PermissionsMixin):
     """A model class for representing a student account in the database."""
 
-    student_email = models.EmailField(unique=True)
+    student_email = models.EmailField(unique=True, primary_key=True)
     num_infractions = models.IntegerField(default=0)
     USERNAME_FIELD = 'student_email'
     EMAIL_FIELD = 'student_email'
