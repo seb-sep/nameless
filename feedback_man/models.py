@@ -8,6 +8,7 @@ import json
 from ...nameless_root import local_settings
 
 # Create your models here.
+# TODO: Test cases for model methods
 
 class Teacher(models.Model):
     """A model class for representing teachers in the database.

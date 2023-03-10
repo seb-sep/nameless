@@ -3,6 +3,8 @@ from rest_framework.decorators import api_view
 from feedback_man.models import Message, Teacher, Course
 from .serializers import MessageSerializer, TeacherSerializer, CourseSerializer
 
+# TODO: Test endpoints
+
 @api_view(['GET'])
 def getData(request):
     student = {'emeail':"sepulveda.s@northeastern.edu"}
