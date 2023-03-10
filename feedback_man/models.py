@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.conf import settings
 from .managers import StudentManager, TeacherManager, CourseManager
+from django.core.mail import send_mail
 
 # Create your models here.
 
@@ -80,5 +81,7 @@ class Message(models.Model):
     message_body = models.TextField()
     is_malicious = models.BooleanField(default=False)
 
-    
+    def email_message(self):
+        """Send the message to the specified teacher if it is not malicious."""
+        send_mail("Message from one of your students", self.message_body, from_email=None, recipient_list=[self.teacher.email])
 
