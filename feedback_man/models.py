@@ -1,8 +1,7 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.conf import settings
-from django.utils import timezone
-import re
+from .managers import StudentManager, TeacherManager, CourseManager
 
 # Create your models here.
 
@@ -14,6 +13,8 @@ class Teacher(models.Model):
     teacher_name = models.CharField(max_length=256, unique=True)
     college = models.CharField(max_length=256)
     email = models.EmailField(max_length=256, unique=True, primary_key=True)
+
+    objects = TeacherManager()
 
     def __str__(self):
         """Return a string representation of the teacher: their name."""
@@ -40,48 +41,12 @@ class Course(models.Model):
     subject = models.CharField(max_length=256)
     teachers = models.ManyToManyField(Teacher)
 
+    objects = CourseManager()
+
     def __str__(self):
         """Return a string representation of the course: the course number and name."""
         return f"{self.course_num} {self.class_name}"
 
-
-class StudentManager(BaseUserManager):
-    def _create_user(self, email: str, password, is_superuser: bool, is_staff: bool):
-        """
-        Create a new user with the given values. Helper method for create_user and create_superuser.
-        """
-        if not email:
-            raise ValueError("Email address required")
-        if not password:
-            raise ValueError("Password required")
-        if not self.is_neu_email(email):
-            raise ValueError("Must give a valid Northeastern email address")
-        
-        now = timezone.now()
-        user = self.model(student_email=email, is_superuser=is_superuser, is_staff=is_staff)
-        user.set_password(password)
-        user.save(using=self._db)
-
-        return user
-
-
-    
-    def create_user(self, email: str, password: str):
-        """
-        Create and save a student user with the given email.
-        This email must be a valid Northeastern email address.
-        """
-        return self._create_user(email, password, False, False) 
-
-    def create_superuser(self, email: str, password: str):
-        return self._create_user(email, password, True, True)
-
-
-    def is_neu_email(self, email: str) -> bool:
-        """
-        Validate whether the given email is a valid NEU Outlook or Gmail email.
-        """
-        return re.compile(r"^[a-zA-Z]+.[a-zA-Z]+@(northeastern|husky.neu).edu$").match(email) != None
 
 
 
@@ -114,4 +79,6 @@ class Message(models.Model):
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
     message_body = models.TextField()
     is_malicious = models.BooleanField(default=False)
+
+    
 
