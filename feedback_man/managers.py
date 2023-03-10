@@ -1,7 +1,6 @@
 from django.contrib.auth.models import BaseUserManager
 from django.db import models
 from django.utils import timezone
-from .models import Teacher, Course
 import re
 import functools
 
@@ -52,7 +51,7 @@ class TeacherManager(models.Manager):
         Search for teachers matching the given name in the database.
         Returns a QuerySet of all teachers who fit the search.
         """
-        return Teacher.objects.filter(teacher_name__iregex=regex_token_search(name))
+        return self.filter(teacher_name__iregex=regex_token_search(name))
     
 class CourseManager(models.Manager):
     def search_course_name(self, name: str):
@@ -60,7 +59,7 @@ class CourseManager(models.Manager):
         Search for courses matching the given name in the database.
         Returns a QuerySet of all courses who fit the search.
         """
-        return Course.objects.filter(course_name__iregex=regex_token_search(name))
+        return self.filter(course_name__iregex=regex_token_search(name))
 
 
 
