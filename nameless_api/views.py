@@ -1,8 +1,7 @@
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from feedback_man.models import Message, Teacher
+from feedback_man.models import Message, Teacher, Course
 from .serializers import MessageSerializer, TeacherSerializer, CourseSerializer
-from . import functions
 
 @api_view(['GET'])
 def getData(request):
@@ -14,7 +13,7 @@ def searchTeacher(request, name):
     """
     Return a JSON response of all teachers in the database who match the given name.
     """
-    teachers = functions.search_teacher_name(name)
+    teachers = Teacher.objects.search_teacher_name(name)
     serializer = TeacherSerializer(teachers, many=True)
     return Response(serializer.data)
 
@@ -23,7 +22,7 @@ def searchCourse(request, name):
     """
     Return a JSON response of all courses in the database who match the given course.
     """
-    courses = functions.search_course_name(name)
+    courses = Course.objects.search_course_name(name)
     serializer = CourseSerializer(courses, many=True)
     return Response(serializer.data)
 
@@ -48,4 +47,4 @@ def sendMessage(request):
 
     if serializer.is_valid():
         #Save to the database and send the message contents to the teacher's email
-        serializer.save()
+        serializer.save().email_message()
