@@ -3,6 +3,9 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.conf import settings
 from .managers import StudentManager, TeacherManager, CourseManager
 from django.core.mail import send_mail
+from googleapiclient import discovery
+import json
+from ...nameless_root import local_settings
 
 # Create your models here.
 
@@ -71,6 +74,16 @@ class StudentAccount(AbstractBaseUser, PermissionsMixin):
         """Return a string representation of the student account: the email."""
 
         return self.student_email
+    
+    def increment_infractions(self):
+        """
+        Increment the number of infractions committed by the student and
+        return the new total.
+        """
+
+        self.num_infractions += 1
+        self.save(update_fields=["num_infractions"])
+        return self.num_infractions
 
 
 class Message(models.Model):
@@ -82,6 +95,51 @@ class Message(models.Model):
     is_malicious = models.BooleanField(default=False)
 
     def email_message(self):
-        """Send the message to the specified teacher if it is not malicious."""
-        send_mail("Message from one of your students", self.message_body, from_email=None, recipient_list=[self.teacher.email])
+        """
+        Check the message for malicious content. If it is malicious, mark as malicious and increment the student account's infractions.
+        If it is not malicious, send the message as an email.
+
+        Returns a dict with a status and message.
+        """
+
+        if self.is_malicious_msg():
+            self.is_malicious = True
+            self.save(update_fields=['is_malicious'])
+
+            num_infractions = self.student.increment_infractions()
+
+            return {"Rejected":f"This message contains toxic or offensive content and will not \
+                    be sent to the teacher. Your account has sent {num_infractions} malicious messages."}
+        else:
+            send_mail("Message from one of your students", self.message_body, from_email=None, recipient_list=[self.teacher.email])
+            return {"Success":"This message has been sent to the teacher."}
+
+    def is_malicious_msg(self):
+        """Check if this message is malicious or not."""
+
+        attributes = {"TOXICITY": {},
+                    "IDENTITY_ATTACK": {},
+                    "INSULT": {}}
+
+        client = discovery.build(
+                    "commentanalzyer",
+                    "v1alpha1",
+                    developerKey=local_settings.perspective_api_key,
+                    discoveryServiceUrl="https://commentanalyzer.googleapis.com/$discovery/rest?version=v1alpha1",
+                    static_discovery=False,
+                )
+
+        analyze_request = {
+            "comment": {"text": self.message_body},
+            "requestedAttributes": attributes
+        }
+        response = client.comments().analyze(body=analyze_request).execute()
+
+        attribute_scores = json.loads(response)["attributeScores"]
+        for score in attribute_scores:
+            if score["summaryScore"]["value"] > 0.7:
+                return True
+
+        return False
+
 

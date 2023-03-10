@@ -4,7 +4,7 @@ from feedback_man.models import Message, Teacher, Course
 class MessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Message
-        fields = '__all__'
+        exclude = ["is_malicious"]
 
 class TeacherSerializer(serializers.ModelSerializer):
     

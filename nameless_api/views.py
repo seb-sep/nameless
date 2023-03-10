@@ -47,4 +47,5 @@ def sendMessage(request):
 
     if serializer.is_valid():
         #Save to the database and send the message contents to the teacher's email
-        serializer.save().email_message()
+        response = serializer.save().send_email()
+        return Response(response)
