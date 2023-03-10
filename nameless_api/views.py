@@ -8,4 +8,6 @@ def getData(request):
     student = {'emeail':"sepulveda.s@northeastern.edu"}
     return Response(student)
 
-
+@api_view(['GET'])
+def searchTeacher(request, name):
+    teachers = Teachers.objects.filter()
